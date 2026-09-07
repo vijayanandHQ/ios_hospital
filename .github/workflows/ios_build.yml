@@ -23,12 +23,11 @@ jobs:
         run: flutter pub get
 
       - name: 🏗️ Build iOS (Simulator)
-        # Generates a build specifically for iOS simulators instead of physical devices
         run: flutter build ios --simulator
 
       - name: 🗜️ Compress iOS build
-        # The path changes to iphonesimulator instead of iphoneos
-        run: tar -czf ios-build.tar.gz build/ios/iphonesimulator/Runner.app
+        # The -C flag forces it to open the directory first, placing Runner.app at the root of the archive
+        run: tar -czf ios-build.tar.gz -C build/ios/iphonesimulator Runner.app
 
       - name: 📤 Upload iOS Artifact
         uses: actions/upload-artifact@v4
