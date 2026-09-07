@@ -1,0 +1,37 @@
+name: Flutter iOS Build (Unsigned)
+
+on:
+  push:
+    branches: ["main", "master"]
+  workflow_dispatch: # இது GitHub வெப்சைட்டிலிருந்து மேனுவலாக ரன் செய்ய உதவும்
+
+jobs:
+  build-ios:
+    name: Build iOS App
+    runs-on: macos-latest # GitHub-ன் இலவச Mac சர்வர்
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v3
+
+      - name: ⚙️ Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+
+      - name: 📦 Install dependencies
+        run: flutter pub get
+
+      - name: 🏗️ Build iOS (Unsigned)
+        # Apple Developer Account இல்லாததால் --no-codesign பயன்படுத்தப்படுகிறது
+        run: flutter build ios --release --no-codesign
+
+      - name: 🗜️ Compress iOS build
+        # உருவான ஆப்பை Zip செய்கிறோம்
+        run: tar -czf ios-build.tar.gz build/ios/iphoneos/Runner.app
+
+      - name: 📤 Upload iOS Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: avoota-ios-app
+          path: ios-build.tar.gz
